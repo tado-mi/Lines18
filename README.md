@@ -155,7 +155,7 @@ Convenience of putting two ints together.
 
 initialises an insance of *Lines18*.
 
-## Stack.java:**
+## Stack.java:
 
 Generic implementation of Stack data structure for further use in the method *isReacable()* in **Lines18.java**.
 
@@ -166,8 +166,6 @@ Yes, I am one of those nerds that make it a point to write their own DS. Don't j
 For more information on the magic, see [here](https://www.cs.swarthmore.edu/~newhall/unixhelp/javamakefiles.html).
 
 ## compiling:
-
-hit on terminal:
     
     make
     java main
