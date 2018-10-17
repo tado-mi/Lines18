@@ -1,6 +1,6 @@
 # showing off:
 
-**author:** tadouchiha
+**author:** Lusine Keshishyan / tadouchiha
 
 **date:**   12 Aug 2018
 
