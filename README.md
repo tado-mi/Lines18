@@ -1,6 +1,6 @@
 # showing off:
 
-**author:** Lusine Keshishyan / tadouchiha
+**author:** Lusine Keshishyan / tado-mi
 
 **date:**   12 Aug 2018
 
