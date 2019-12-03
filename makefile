@@ -1,5 +1,7 @@
 # variable for java compiler
 JC = javac
+D = -d
+CD = cd
 
 # damage control
 .SUFFIXES: .java .class
@@ -8,8 +10,8 @@ JC = javac
 #	.original_extention.target_extention:
 #		rule
 .java.class:
-	$(JC) $*.java
-	
+	$(JC) $*.java $(D) bin
+
 # macro for each java source file
 CLASSES = \
 	BallPath.java \
@@ -20,12 +22,14 @@ CLASSES = \
 	main.java \
 	Point.java \
 	Stack.java
-	
+
 # default target definition
 default: classes
 
 classes: $(CLASSES:.java=.class)
 
+run:
+	$(CD) bin && java main
+
 clean:
 	$(RM) *.class
-	
