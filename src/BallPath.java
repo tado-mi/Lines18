@@ -1,3 +1,5 @@
+package src;
+
 public class BallPath {
 
 //    supports basic functionalities of an array list

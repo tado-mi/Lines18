@@ -14,14 +14,14 @@ CD = cd
 
 # macro for each java source file
 CLASSES = \
-	BallPath.java \
-	Highlighter.java \
-	HighScoreList.java \
-	Lines18.java \
-	Lines18GUI.java \
-	main.java \
-	Point.java \
-	Stack.java
+	src/Point.java \
+	src/BallPath.java \
+	src/Highlighter.java \
+	src/HighScoreList.java \
+	src/Lines18.java \
+	src/Lines18GUI.java \
+	src/main.java \
+	src/Stack.java
 
 # default target definition
 default: classes
@@ -29,7 +29,7 @@ default: classes
 classes: $(CLASSES:.java=.class)
 
 run:
-	$(CD) bin && java main
+	$(CD) bin/src && java main
 
 clean:
 	$(RM) *.class

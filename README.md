@@ -1,36 +1,17 @@
-# showing off:
+# Lines 18
 
-**author:** Lusine Keshishyan / tado-mi
+Code written by [tado-mi](https://github.com/tado-mi), in summer of 2018.<br/><br/>
 
-**date:**   12 Aug 2018
+Included is a set of Java source code files for a game heavily inspired by the classical [Lines98](https://www.lines98.com/).<br/><br/>
 
-**use:**    free. credit when due is encouraged and appreciated
+The game is a 9 x 9 grid, containing balls of 5 different colors. Horizontal, vertical or diagonal alignment of 5 or more balls of the same color results in them disappearing, and the user's score is incremented. There are 3 balls randomly generated and added to the grid after each move that does not result in a hit. Objective of the game is to gain as higher score as possible before the grid fills up with balls and no more movement is possible.<br/><br/>
 
-# general:
+The user is allowed to move balls if there is a path from a ball's current location to the desired location, and the desired location is empty.<br/><br/>
 
-included is a package of Java source code files for a game, heavily inspired by classical game [Lines98](https://www.lines98.com/).
+Some of the supported features include:
 
-Lines18 is a 9 x 9 grid, containing balls of 5 different colors. Horizontal, vertical or diagonal alignment of 5 or more balls of the same color results in said balls disappearing and incrementing the user's score. There are 3 balls randomly generated and added to the grid after each move that does not result in a hit
-
-Objective of the game is to gain as higher score as possible before the grid fills up with balls and no more movement is possible
-
-The user is allowed to move balls if there is a path from a ball's current location to the desired location and the desired location is empty
-
-# supported features:
-
-- **viewing which locations would be filled with new balls**
-
-- **viewing balls of which color will be added**
-
-- **viewing both the location and the color**
-
-achieved by randomly generating and maintaing a global arrays representing the location and the color of balls to be added after user's next move
-
-- **undo the last user move**
-
-acheived by maintaing
-
-- an array of two Points, representing the last user's latest move and switching it back.
+* viewing the locations and / or the color of the 'future' balls
+* undo the last user move, acheived by maintaing (1) an array of two Points, representing the last user's latest move and switching it back.
 - an array of BallPaths representing the balls that disappeared in the result of the previous move (requested from the GUI)
 
 # user control not listed on GUI:
@@ -56,13 +37,13 @@ Essentially an ArrayList of BallBaths. Maintains a *java* ArrayList of Colors, c
 ### non-trivial methods:
 
 #### draw(Graphics g, int xZero, int yZero, int gridSize):
-	
+
 visually highlights all the BallPaths with their Color
-	
+
 - initialises a size of a side of the square, proportional to the provided gridSize
 - locates the upper leftmost corner of each rectangle as (xZero + x * gridSize, yZero + y * gridSize), where xZero, yZero and gridSize are provided parameters, and x, y are taken from BallPaths
 - draws the square
-	
+
 repeats for all the BallPaths
 
 ## HighScoreList.java:
@@ -74,9 +55,9 @@ Each time Lines18 is called, HighScoreList reads from the external file to creat
 ### non-trivial methods:
 
 #### update(int score, String username):
-	
+
 if the offered score is greater than the lowest recorded score, or there is available capacity, the offered score is recorded st the array remains sorted
-	
+
 the updated arrays are recorded in the external .txt file at the end
 
 ## Lines18.java:
@@ -104,43 +85,43 @@ called by the constructor
 #### mouseClicked(MouseEvent e):
 
 - return if the click happened outside the grid
-	
+
 - otherwise
-	
+
 - if selected cell is occupied with a ball updates the global current (: selected) ball coordinates (xCurr, yCurr)
-	
+
 - otherwise
-	
+
 - if the current ball coordinates are non-negative and there is a path from the current ball location to the clicked location, and moves the selected ball there by updating the grid
-	
+
 #### isReachable(int x, int y):
-	
+
 treats the grid as a graph, with each cell corresponding to a vertex, connected to its horizontal and vertical (i.e. non-diagonal) neighbors if they do not contain a ball
-	
+
 performs a [DFS](https://en.wikipedia.org/wiki/Depth-first_search) rooted at the vertex corresponding to the current (: selected) ball and reports if the vertex corresponding to the provided (x, y) cell is reachable or not.
-	
+
 #### isFutureConflict():
-	
+
 reports whether or not the cell corresponding to current (: selected) ball would have been occupied by a new ball (to be added after the move)
-	
+
 #### futureConflict():
-	
+
 regenereates random locations for balls to be added to so that there is no conflict between a prohected location
-	
+
 #### updateScore():
-	
+
 reports whether or not the user's move has resulted in one or more alignments
 
 if so, erases the balls and increments the score by the number of erased balls
-	
+
 #### addBalls(int n):
-	
+
 - adds the projected future balls to the grid and calls updateScore for each of them.
 
 - calls SetFuture(n) to prepare for the next call
-	
+
 #### setFuture(int n):
-	
+
 updates the global array of locations and colors of future balls by randomly generating and ensuring that there are no conflicts with existing allignments
 
 ## Lines18GUI.java:
@@ -161,12 +142,16 @@ Generic implementation of Stack data structure for further use in the method *is
 
 Yes, I am one of those nerds that make it a point to write their own DS. Don't judge :)
 
+# Run
+
+**important**: need to fix dependencies
+
 ## makefile:
 
 For more information on the magic, see [here](https://www.cs.swarthmore.edu/~newhall/unixhelp/javamakefiles.html).
 
 ## compiling:
-    
+
     make
     java main
     make clean
