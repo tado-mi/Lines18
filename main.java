@@ -1,6 +1,6 @@
-package src;
+// import src.Lines18;
 
-public class main{
+public class main {
 
 	public static void main(String[] args) {
 

@@ -1,4 +1,4 @@
-package src;
+// package gui;
 
 // for the use of Random, ArrayList
 import java.util.*;
@@ -8,6 +8,12 @@ import java.awt.*;
 
 // for extending JComponent
 import javax.swing.*;
+
+// 'my' highlighter
+// import gui.util.Highlighter;
+
+import util.Point;
+import util.HighScoreList;
 
 public class Lines18GUI extends JComponent {
 

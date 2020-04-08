@@ -1,4 +1,4 @@
-package src;
+// package src;
 
 // for the use of random function
 import java.util.*;
@@ -9,6 +9,9 @@ import java.awt.event.*;
 
 // for extending JFrame
 import javax.swing.*;
+
+import util.Point;
+import util.HighScoreList;
 
 public class Lines18 extends JFrame implements MouseListener, KeyListener {
 
