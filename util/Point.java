@@ -2,19 +2,19 @@ package util;
 
 public class Point{
 
-    public int x, y;
+  public int x, y;
+  
+  public Point(int x, int y) {
 
-    public Point(int x, int y) {
+    this.x = x;
+    this.y = y;
 
-        this.x = x;
-        this.y = y;
+  }
 
-    }
+  public String toString() {
 
-    public String toString() {
+    return "[ " + x + " ] [ " + y + " ]";
 
-        return "[ " + x + " ] [ " + y + " ]";
-
-    }
+  }
 
 }

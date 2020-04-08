@@ -17,619 +17,619 @@ import util.HighScoreList;
 
 public class Lines18GUI extends JComponent {
 
-    Graphics graphics;
-//    width, height
-    int w, h;
-//    left-most, top-most corner of the GUI
-    int xZero, yZero;
-//    current cell
-    int xCurrCell, yCurrCell;
-//    the underlying grid, gridSize, score
-    int grid[][];
-    int gridSize, score, fontSize;
-//    colors
-    int numCols;
-    ArrayList<Color> colSet;
-    Color base, back, white;
+  Graphics graphics;
+  //    width, height
+  int w, h;
+  //    left-most, top-most corner of the GUI
+  int xZero, yZero;
+  //    current cell
+  int xCurrCell, yCurrCell;
+  //    the underlying grid, gridSize, score
+  int grid[][];
+  int gridSize, score, fontSize;
+  //    colors
+  int numCols;
+  ArrayList<Color> colSet;
+  Color base, back, white;
 
-// bake
+  // bake
 
-    boolean gameOver;
+  boolean gameOver;
 
-//    for asking and taking a username
-    String username;
-    boolean userBar;
+  //    for asking and taking a username
+  String username;
+  boolean userBar;
 
-//    for HighScoreList
-    boolean showHighScore;
-    HighScoreList highScoreList;
+  //    for HighScoreList
+  boolean showHighScore;
+  HighScoreList highScoreList;
 
-//    future Balls
-    boolean showFutureColor, showFutureLocation;
-    Point[] futureBalls;
-      int[] futureCols;
+  //    future Balls
+  boolean showFutureColor, showFutureLocation;
+  Point[] futureBalls;
+  int[] futureCols;
 
-//      highlightinh
-    Highlighter highlighter;
-    Highlighter lastBlown;
+  //      highlightinh
+  Highlighter highlighter;
+  Highlighter lastBlown;
 
-    public Lines18GUI() {
+  public Lines18GUI() {
 
-        showFutureColor    = false;
-        showFutureLocation = false;
-        showHighScore      = false;
+    showFutureColor    = false;
+    showFutureLocation = false;
+    showHighScore      = false;
 
-        gameOver = false;
-        userBar  = false;
+    gameOver = false;
+    userBar  = false;
 
-        username = "";
+    username = "";
 
-        xCurrCell = -1;
-        yCurrCell = -1;
+    xCurrCell = -1;
+    yCurrCell = -1;
+
+  }
+
+  public void paintComponent(Graphics g) {
+
+    graphics = g;
+
+    drawBackground();
+
+    drawFuture();
+
+    drawBalls();
+    drawHighlight();
+    drawCurr();
+
+    drawPanel();
+
+    drawHighScore();
+    drawUsernameBar();
+
+  }
+
+  //    setters
+  public void setDim(int xZero, int yZero) {
+
+    this.xZero = xZero;
+    this.yZero = yZero;
+
+    repaint();
+
+  }
+
+  public void setGrid(int g[][], int gS) {
+
+    grid = g;
+    gridSize = gS;
+    fontSize = 3 * gridSize / 5;
+
+    if (grid == null) return;
+
+    //        adjust width and height
+    w = gridSize * grid.length;
+
+    h = gridSize * grid[0].length;
+
+    repaint();
+
+  }
+
+  public void setNumColor(int n) {
+
+    numCols = n;
+    initColSet();
+
+  }
+
+  public void setHighScore(HighScoreList h) {
+
+    highScoreList = h;
+
+  }
+
+  //    initialise color set
+  public void initColSet() {
+
+    int temp = 5;
+    base = new Color(temp, temp, temp);
+    temp = 90;
+    back = new Color(temp, temp, temp);
+    temp = 255;
+    white = new Color(temp, temp, temp);
+
+    colSet = new ArrayList<Color>();
+
+    if (numCols == 5) {
+
+      //            red
+      colSet.add(new Color(210, 75, 80));
+      //            yellow
+      colSet.add(new Color(255, 235, 155));
+      //            green
+      colSet.add(new Color(140, 210, 120));
+      //            blue
+      colSet.add(new Color(75, 195, 210));
+      //            purple
+      colSet.add(new Color(200, 155, 255));
+
+
+    } else {
+
+      //            damage control
+
+      Random rand = new Random();
+
+      for (int i = 0; i < numCols; i = i + 1) {
+
+        int n = 256;
+
+        int r = rand.nextInt() % n;
+        if (r < 0) r = r + n;
+
+        int g = rand.nextInt() % n;
+        if (g < 0) g = g + n;
+
+        int b = rand.nextInt() % n;
+        if (b < 0) b = b + n;
+
+        Color color = new Color(r, g, b);
+
+        colSet.add(color);
+
+      }
 
     }
 
-    public void paintComponent(Graphics g) {
+  }
 
-        graphics = g;
+  //   drawing methods
+  public void drawBackground() {
 
-        drawBackground();
+    graphics.setColor(back);
+    graphics.fillRect(xZero, yZero, w, h);
 
-        drawFuture();
+    //        grid
+    graphics.setColor(base);
 
-        drawBalls();
-        drawHighlight();
-        drawCurr();
+    for (int i = 0; i <= w;  i = i + gridSize) {
 
-        drawPanel();
-
-        drawHighScore();
-        drawUsernameBar();
+      graphics.drawLine(i + xZero, yZero, i + xZero, h + yZero);
 
     }
 
-//    setters
-    public void setDim(int xZero, int yZero) {
+    for (int i = 0; i <= h; i = i + gridSize) {
 
-        this.xZero = xZero;
-        this.yZero = yZero;
-
-        repaint();
+      graphics.drawLine(xZero, i + yZero, w + xZero, i + yZero);
 
     }
 
-    public void setGrid(int g[][], int gS) {
+  }
 
-        grid = g;
-        gridSize = gS;
-        fontSize = 3 * gridSize / 5;
+  public void drawBalls() {
 
-        if (grid == null) return;
+    if (grid == null || gridSize == 0) return;
 
-//        adjust width and height
-        w = gridSize * grid.length;
+    int radius = 4 * gridSize / 5;
 
-        h = gridSize * grid[0].length;
+    if (colSet == null) initColSet();
 
-        repaint();
+    for (int i = 0; i < grid.length; i = i + 1) {
 
-    }
+      for (int j = 0; j < grid[i].length; j = j + 1) {
 
-    public void setNumColor(int n) {
+        if (grid[i][j] < 0) continue;
 
-        numCols = n;
-        initColSet();
+        int x = i * gridSize;
+        int y = j * gridSize;
 
-    }
+        int c = grid[i][j];
 
-    public void setHighScore(HighScoreList h) {
+        if (c > numCols - 1) {
 
-        highScoreList = h;
-
-    }
-
-//    initialise color set
-    public void initColSet() {
-
-        int temp = 5;
-        base = new Color(temp, temp, temp);
-        temp = 90;
-        back = new Color(temp, temp, temp);
-        temp = 255;
-        white = new Color(temp, temp, temp);
-
-        colSet = new ArrayList<Color>();
-
-        if (numCols == 5) {
-
-//            red
-            colSet.add(new Color(210, 75, 80));
-//            yellow
-            colSet.add(new Color(255, 235, 155));
-//            green
-            colSet.add(new Color(140, 210, 120));
-//            blue
-            colSet.add(new Color(75, 195, 210));
-//            purple
-            colSet.add(new Color(200, 155, 255));
-
-
-        } else {
-
-//            damage control
-
-            Random rand = new Random();
-
-            for (int i = 0; i < numCols; i = i + 1) {
-
-                int n = 256;
-
-                int r = rand.nextInt() % n;
-                if (r < 0) r = r + n;
-
-                int g = rand.nextInt() % n;
-                if (g < 0) g = g + n;
-
-                int b = rand.nextInt() % n;
-                if (b < 0) b = b + n;
-
-                Color color = new Color(r, g, b);
-
-                colSet.add(color);
-
-            }
+          grid[i][j] = -1;
+          continue;
 
         }
 
-    }
-
-//   drawing methods
-    public void drawBackground() {
-
-        graphics.setColor(back);
-        graphics.fillRect(xZero, yZero, w, h);
-
-//        grid
-        graphics.setColor(base);
-
-		for (int i = 0; i <= w;  i = i + gridSize) {
-
-            graphics.drawLine(i + xZero, yZero, i + xZero, h + yZero);
-
-        }
-
-        for (int i = 0; i <= h; i = i + gridSize) {
-
-            graphics.drawLine(xZero, i + yZero, w + xZero, i + yZero);
-
-        }
-
-    }
-
-    public void drawBalls() {
-
-        if (grid == null || gridSize == 0) return;
-
-        int radius = 4 * gridSize / 5;
-
-        if (colSet == null) initColSet();
-
-        for (int i = 0; i < grid.length; i = i + 1) {
-
-            for (int j = 0; j < grid[i].length; j = j + 1) {
-
-                if (grid[i][j] < 0) continue;
-
-                int x = i * gridSize;
-                int y = j * gridSize;
-
-                int c = grid[i][j];
-
-                if (c > numCols - 1) {
-
-                    grid[i][j] = -1;
-                    continue;
-
-                }
-
-                graphics.setColor(colSet.get(c));
-                graphics.fillOval(xZero + x + ((gridSize - radius) / 2), yZero + y + ((gridSize - radius) / 2), radius, radius);
-                graphics.setColor(white);
-                graphics.drawOval(xZero + x + ((gridSize - radius) / 2), yZero + y + ((gridSize - radius) / 2), radius, radius);
-
-            }
-
-        }
-
-    }
-
-    public void drawFuture() {
-
-        if (!showFutureLocation) return;
-
-        if (futureBalls == null || futureCols == null) return;
-
-        if (futureBalls.length  != futureCols.length)  return;
-
-        int radius = gridSize / 4;
-
-        for (int i = 0; i < futureBalls.length; i = i + 1) {
-
-            Point P = futureBalls[i];
-
-            int x = xZero + (P.x * gridSize) + gridSize / 2;
-            x = x - radius / 2;
-            int y = yZero + (P.y * gridSize) + gridSize / 2;
-            y = y - radius / 2;
-
-            int c = futureCols[i];
-
-            if (showFutureColor) graphics.setColor(colSet.get(c));
-            else graphics.setColor(back);
-
-            graphics.fillOval(x, y, radius, radius);
-            graphics.setColor(white);
-            graphics.drawOval(x, y, radius, radius);
-
-        }
-
-    }
-
-    public void drawPanel() {
-
-        int xTop = xZero + w + gridSize;
-        int yTop = yZero;
-
-        int width  = 4 * gridSize;
-        int height = h;
-
-//        background
-        graphics.setColor(back);
-        graphics.fillRect(xTop, yTop, width, height);
-
-//        frame
-        graphics.setColor(base);
-        graphics.drawRect(xTop, yTop, width, height);
-
-//        drawScore
-        fontSize = 2 * gridSize / 5;
-        xTop = xTop + fontSize / 4;
+        graphics.setColor(colSet.get(c));
+        graphics.fillOval(xZero + x + ((gridSize - radius) / 2), yZero + y + ((gridSize - radius) / 2), radius, radius);
         graphics.setColor(white);
-        graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
-        graphics.drawString("Score: " + score, xTop, yTop + fontSize);
+        graphics.drawOval(xZero + x + ((gridSize - radius) / 2), yZero + y + ((gridSize - radius) / 2), radius, radius);
 
-        yTop = yTop + fontSize;
-
-//        instructions for gameOver
-        if (gameOver) {
-
-            graphics.setColor(new Color(255, 75, 80));
-            graphics.drawString("Game is Over!", xTop, yTop + 2 * fontSize);
-
-            return;
-
-        }
-
-//      draw next 3 colors
-        if (showFutureColor) {
-
-            if (futureBalls == null || futureCols == null) return;
-
-                if (futureBalls.length  != futureCols.length)  return;
-
-                int radius = 2 * gridSize / 3;
-
-                yTop = yTop + fontSize;
-
-                for (int i = 0; i < futureBalls.length; i = i + 1) {
-
-                    Point P = futureBalls[i];
-
-                    int x = xTop + i * (3 * radius / 2);
-
-                    int y = yTop;
-
-                    int c = futureCols[i];
-
-                    graphics.setColor(colSet.get(c));
-
-                    graphics.fillOval(x, y, radius, radius);
-                    graphics.setColor(white);
-                    graphics.drawOval(x, y, radius, radius);
-
-                }
-
-                yTop = yTop + radius;
-
-        }
-
-//        instructions for user
-        graphics.drawString("Shift + C:", xTop, yTop + 2 * fontSize);
-        yTop = yTop + fontSize;
-        if (!showFutureColor) graphics.drawString("show colors", xTop, yTop + 2 * fontSize);
-        else                  graphics.drawString("hide colors", xTop, yTop + 2 * fontSize);
-
-        yTop = yTop + 2 * fontSize;
-
-        graphics.drawString("Shift + S:", xTop, yTop + 2 * fontSize);
-        yTop = yTop + fontSize;
-        if (!showFutureLocation) graphics.drawString("show locations", xTop, yTop + 2 * fontSize);
-        else                     graphics.drawString("hide locations", xTop, yTop + 2 * fontSize);
-
-        yTop = yTop + 2 * fontSize;
-
-        graphics.drawString("Shift + Z:", xTop, yTop + 2 * fontSize);
-        yTop = yTop + fontSize;
-        graphics.drawString("cancel last move", xTop - fontSize / 8, yTop + 2 * fontSize);
-
-        yTop = yTop + 2 * fontSize;
-
-        graphics.drawString("Shift + R:", xTop, yTop + 2 * fontSize);
-        yTop = yTop + fontSize;
-        graphics.drawString("restart", xTop, yTop + 2 * fontSize);
-
-        yTop = yTop + 2 * fontSize;
-
-        graphics.drawString("Shift + H:", xTop, yTop + 2 * fontSize);
-        yTop = yTop + fontSize;
-        if (!showHighScore) graphics.drawString("show highscore list", xTop, yTop + 2 * fontSize);
-        else                graphics.drawString("hide highscore list", xTop, yTop + 2 * fontSize);
-
-        yTop = yTop + 2 * fontSize;
-
-        graphics.drawString("Shift + M:", xTop, yTop + 2 * fontSize);
-        yTop = yTop + fontSize;
-        graphics.drawString("add more balls", xTop, yTop + 2 * fontSize);
+      }
 
     }
 
-    public void drawHighlight() {
+  }
 
-        if (highlighter == null) return;
+  public void drawFuture() {
 
-        highlighter.draw(graphics, xZero, yZero, gridSize);
+    if (!showFutureLocation) return;
+
+    if (futureBalls == null || futureCols == null) return;
+
+    if (futureBalls.length  != futureCols.length)  return;
+
+    int radius = gridSize / 4;
+
+    for (int i = 0; i < futureBalls.length; i = i + 1) {
+
+      Point P = futureBalls[i];
+
+      int x = xZero + (P.x * gridSize) + gridSize / 2;
+      x = x - radius / 2;
+      int y = yZero + (P.y * gridSize) + gridSize / 2;
+      y = y - radius / 2;
+
+      int c = futureCols[i];
+
+      if (showFutureColor) graphics.setColor(colSet.get(c));
+      else graphics.setColor(back);
+
+      graphics.fillOval(x, y, radius, radius);
+      graphics.setColor(white);
+      graphics.drawOval(x, y, radius, radius);
 
     }
 
-    public void drawUsernameBar() {
+  }
 
-        if (!userBar) return;
+  public void drawPanel() {
 
-        if (showHighScore) {
+    int xTop = xZero + w + gridSize;
+    int yTop = yZero;
 
-            showHighScore = false;
-            repaint();
+    int width  = 4 * gridSize;
+    int height = h;
 
-        }
+    //        background
+    graphics.setColor(back);
+    graphics.fillRect(xTop, yTop, width, height);
 
-//        draw background
-       int xTop = xZero + gridSize / 2;
-       int yTop = yZero + h / 3;
+    //        frame
+    graphics.setColor(base);
+    graphics.drawRect(xTop, yTop, width, height);
 
-       int width  = w + 4 * gridSize;
-       int height = 5 * gridSize / 2;
+    //        drawScore
+    fontSize = 2 * gridSize / 5;
+    xTop = xTop + fontSize / 4;
+    graphics.setColor(white);
+    graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
+    graphics.drawString("Score: " + score, xTop, yTop + fontSize);
 
-       graphics.setColor(back);
-       graphics.fillRect(xTop, yTop, width, height);
-       graphics.setColor(base);
-       graphics.drawRect(xTop, yTop, width, height);
+    yTop = yTop + fontSize;
 
-//        draw field for the string
-        fontSize = 3 * gridSize / 5;
-        width  = width - gridSize;
-        height = 3 * fontSize;
+    //        instructions for gameOver
+    if (gameOver) {
 
-        xTop = xTop + gridSize / 2;
-        yTop = yTop + fontSize / 2;
+      graphics.setColor(new Color(255, 75, 80));
+      graphics.drawString("Game is Over!", xTop, yTop + 2 * fontSize);
 
+      return;
+
+    }
+
+    //      draw next 3 colors
+    if (showFutureColor) {
+
+      if (futureBalls == null || futureCols == null) return;
+
+      if (futureBalls.length  != futureCols.length)  return;
+
+      int radius = 2 * gridSize / 3;
+
+      yTop = yTop + fontSize;
+
+      for (int i = 0; i < futureBalls.length; i = i + 1) {
+
+        Point P = futureBalls[i];
+
+        int x = xTop + i * (3 * radius / 2);
+
+        int y = yTop;
+
+        int c = futureCols[i];
+
+        graphics.setColor(colSet.get(c));
+
+        graphics.fillOval(x, y, radius, radius);
         graphics.setColor(white);
-        graphics.fillRect(xTop, yTop, width, height);
-        graphics.setColor(base);
-        graphics.drawRect(xTop, yTop, width, height);
+        graphics.drawOval(x, y, radius, radius);
 
-//        draw the string
+      }
 
-        yTop = yTop + fontSize + 5;
-        xTop = xTop + 10;
-
-        graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
-        graphics.setColor(colSet.get(numCols - 1));
-        graphics.drawString(username, xTop, yTop);
-
-//        write information
-        yTop = yTop + fontSize;
-        fontSize = fontSize - 10;
-
-        graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
-        graphics.setColor(base);
-        graphics.drawString("[insert name] [ENTER to continue]", xTop + 3 * gridSize, yTop);
+      yTop = yTop + radius;
 
     }
 
-    public void drawHighScore() {
+    //        instructions for user
+    graphics.drawString("Shift + C:", xTop, yTop + 2 * fontSize);
+    yTop = yTop + fontSize;
+    if (!showFutureColor) graphics.drawString("show colors", xTop, yTop + 2 * fontSize);
+    else                  graphics.drawString("hide colors", xTop, yTop + 2 * fontSize);
 
-        if (!showHighScore || userBar) return;
+    yTop = yTop + 2 * fontSize;
 
-        int xTop = xZero + gridSize / 2;
-        int yTop = yZero + gridSize / 2;
+    graphics.drawString("Shift + S:", xTop, yTop + 2 * fontSize);
+    yTop = yTop + fontSize;
+    if (!showFutureLocation) graphics.drawString("show locations", xTop, yTop + 2 * fontSize);
+    else                     graphics.drawString("hide locations", xTop, yTop + 2 * fontSize);
 
-        int width  = w + 4 * gridSize;
-        int height = h - gridSize;
+    yTop = yTop + 2 * fontSize;
 
-        graphics.setColor(white);
-        graphics.fillRect(xTop, yTop, width, height);
-        graphics.setColor(base);
-        graphics.drawRect(xTop, yTop, width, height);
+    graphics.drawString("Shift + Z:", xTop, yTop + 2 * fontSize);
+    yTop = yTop + fontSize;
+    graphics.drawString("cancel last move", xTop - fontSize / 8, yTop + 2 * fontSize);
 
-        if (highScoreList == null) return;
+    yTop = yTop + 2 * fontSize;
 
-        fontSize = 3 * gridSize / 5;
-        graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
+    graphics.drawString("Shift + R:", xTop, yTop + 2 * fontSize);
+    yTop = yTop + fontSize;
+    graphics.drawString("restart", xTop, yTop + 2 * fontSize);
 
-        xTop = xTop + 10;
-        yTop = yTop + 10 + fontSize;
+    yTop = yTop + 2 * fontSize;
 
-        int xEnd = xTop + (2 * width) / 3;
+    graphics.drawString("Shift + H:", xTop, yTop + 2 * fontSize);
+    yTop = yTop + fontSize;
+    if (!showHighScore) graphics.drawString("show highscore list", xTop, yTop + 2 * fontSize);
+    else                graphics.drawString("hide highscore list", xTop, yTop + 2 * fontSize);
 
-        for (int i = 0; i < highScoreList.num(); i = i + 1) {
+    yTop = yTop + 2 * fontSize;
 
-            graphics.setColor(colSet.get(i % numCols));
+    graphics.drawString("Shift + M:", xTop, yTop + 2 * fontSize);
+    yTop = yTop + fontSize;
+    graphics.drawString("add more balls", xTop, yTop + 2 * fontSize);
 
-            String str = highScoreList.getUser(i);
-            graphics.drawString(str, xTop, yTop);
+  }
 
-            String scr = highScoreList.getScore(i) + "";
-            graphics.drawString(scr, xEnd, yTop);
+  public void drawHighlight() {
 
-            yTop = yTop + 2 * fontSize;
+    if (highlighter == null) return;
 
-        }
+    highlighter.draw(graphics, xZero, yZero, gridSize);
 
-        fontSize = 2 * gridSize / 5;
-        graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
-        graphics.setColor(base);
-        graphics.drawString("[SHIFT + H] to hide", xTop + width / 3, yTop);
+  }
 
-    }
+  public void drawUsernameBar() {
 
-    public void drawCurr() {
+    if (!userBar) return;
 
-        if (xCurrCell == -1 || yCurrCell == -1) return;
+    if (showHighScore) {
 
-        int diff = 4;
-        int size = gridSize - diff;
-
-        int xTop = xZero + (xCurrCell * gridSize) + diff / 2;
-        int yTop = yZero + (yCurrCell * gridSize) + diff / 2;
-
-        if (grid[xCurrCell][yCurrCell] == -1) return;
-
-        graphics.setColor(colSet.get(grid[xCurrCell][yCurrCell]));
-        graphics.drawOval(xTop, yTop, size, size);
+      showHighScore = false;
+      repaint();
 
     }
 
-//    update
-    public void updateGrid(int g[][]) {
+    //        draw background
+    int xTop = xZero + gridSize / 2;
+    int yTop = yZero + h / 3;
 
-        grid = g;
-        repaint();
+    int width  = w + 4 * gridSize;
+    int height = 5 * gridSize / 2;
 
-    }
+    graphics.setColor(back);
+    graphics.fillRect(xTop, yTop, width, height);
+    graphics.setColor(base);
+    graphics.drawRect(xTop, yTop, width, height);
 
-    public void updateScore(int s) {
+    //        draw field for the string
+    fontSize = 3 * gridSize / 5;
+    width  = width - gridSize;
+    height = 3 * fontSize;
 
-        score = s;
-        repaint();
+    xTop = xTop + gridSize / 2;
+    yTop = yTop + fontSize / 2;
 
-    }
+    graphics.setColor(white);
+    graphics.fillRect(xTop, yTop, width, height);
+    graphics.setColor(base);
+    graphics.drawRect(xTop, yTop, width, height);
 
-    public void updateFuture(Point[] P, int[] C) {
+    //        draw the string
 
-        futureBalls = P;
-        futureCols  = C;
-        if (showFutureColor || showFutureLocation) repaint();
+    yTop = yTop + fontSize + 5;
+    xTop = xTop + 10;
 
-    }
+    graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
+    graphics.setColor(colSet.get(numCols - 1));
+    graphics.drawString(username, xTop, yTop);
 
-    public void showLocation() {
+    //        write information
+    yTop = yTop + fontSize;
+    fontSize = fontSize - 10;
 
-        showFutureLocation = !showFutureLocation;
-        repaint();
+    graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
+    graphics.setColor(base);
+    graphics.drawString("[insert name] [ENTER to continue]", xTop + 3 * gridSize, yTop);
 
-    }
+  }
 
-    public void showColor() {
+  public void drawHighScore() {
 
-        showFutureColor = !showFutureColor;
-        repaint();
+    if (!showHighScore || userBar) return;
 
-    }
+    int xTop = xZero + gridSize / 2;
+    int yTop = yZero + gridSize / 2;
 
-    public void updateCurr(int x, int y) {
+    int width  = w + 4 * gridSize;
+    int height = h - gridSize;
 
-        xCurrCell = x;
-        yCurrCell = y;
+    graphics.setColor(white);
+    graphics.fillRect(xTop, yTop, width, height);
+    graphics.setColor(base);
+    graphics.drawRect(xTop, yTop, width, height);
 
-        repaint();
+    if (highScoreList == null) return;
 
-    }
+    fontSize = 3 * gridSize / 5;
+    graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
 
-//   add a path to highlight
-    public void addHighlight(BallPath P) {
+    xTop = xTop + 10;
+    yTop = yTop + 10 + fontSize;
 
-        if (highlighter == null) highlighter = new Highlighter(colSet);
-        if (lastBlown   == null) lastBlown   = new Highlighter(colSet);
+    int xEnd = xTop + (2 * width) / 3;
 
-        if (highlighter.num() < lastBlown.num()) lastBlown = new Highlighter(colSet);
+    for (int i = 0; i < highScoreList.num(); i = i + 1) {
 
-        highlighter.add(P);
-        lastBlown.add(P);
+      graphics.setColor(colSet.get(i % numCols));
 
-        repaint();
+      String str = highScoreList.getUser(i);
+      graphics.drawString(str, xTop, yTop);
 
-    }
+      String scr = highScoreList.getScore(i) + "";
+      graphics.drawString(scr, xEnd, yTop);
 
-    public void releaseHighlight() {
-
-        if (highlighter == null) return;
-
-        highlighter.release();
-        repaint();
-
-    }
-
-    public BallPath getLastPath() {
-
-        return lastBlown.set();
-
-    }
-
-
-//    GUI controls
-    public void gameOver() {
-
-        gameOver = true;
-        repaint();
+      yTop = yTop + 2 * fontSize;
 
     }
 
-    public void restart() {
+    fontSize = 2 * gridSize / 5;
+    graphics.setFont(new Font("Ubuntu", Font.PLAIN, fontSize));
+    graphics.setColor(base);
+    graphics.drawString("[SHIFT + H] to hide", xTop + width / 3, yTop);
 
-        xCurrCell = -1;
-        yCurrCell = -1;
+  }
 
-        gameOver = false;
-        repaint();
+  public void drawCurr() {
 
-    }
+    if (xCurrCell == -1 || yCurrCell == -1) return;
 
-    public void updateUsername(String str) {
+    int diff = 4;
+    int size = gridSize - diff;
 
-        username = str;
-        repaint();
+    int xTop = xZero + (xCurrCell * gridSize) + diff / 2;
+    int yTop = yZero + (yCurrCell * gridSize) + diff / 2;
 
-    }
+    if (grid[xCurrCell][yCurrCell] == -1) return;
 
-    public void usernameBar() {
+    graphics.setColor(colSet.get(grid[xCurrCell][yCurrCell]));
+    graphics.drawOval(xTop, yTop, size, size);
 
-        userBar = true;
-        repaint();
+  }
 
-    }
+  //    update
+  public void updateGrid(int g[][]) {
 
-    public void hideUsernameBar() {
+    grid = g;
+    repaint();
 
-        userBar = false;
-        repaint();
+  }
 
-    }
+  public void updateScore(int s) {
 
-    public void showHighScore() {
+    score = s;
+    repaint();
 
-        showHighScore = !showHighScore;
-        repaint();
+  }
 
-    }
+  public void updateFuture(Point[] P, int[] C) {
+
+    futureBalls = P;
+    futureCols  = C;
+    if (showFutureColor || showFutureLocation) repaint();
+
+  }
+
+  public void showLocation() {
+
+    showFutureLocation = !showFutureLocation;
+    repaint();
+
+  }
+
+  public void showColor() {
+
+    showFutureColor = !showFutureColor;
+    repaint();
+
+  }
+
+  public void updateCurr(int x, int y) {
+
+    xCurrCell = x;
+    yCurrCell = y;
+
+    repaint();
+
+  }
+
+  //   add a path to highlight
+  public void addHighlight(BallPath P) {
+
+    if (highlighter == null) highlighter = new Highlighter(colSet);
+    if (lastBlown   == null) lastBlown   = new Highlighter(colSet);
+
+    if (highlighter.num() < lastBlown.num()) lastBlown = new Highlighter(colSet);
+
+    highlighter.add(P);
+    lastBlown.add(P);
+
+    repaint();
+
+  }
+
+  public void releaseHighlight() {
+
+    if (highlighter == null) return;
+
+    highlighter.release();
+    repaint();
+
+  }
+
+  public BallPath getLastPath() {
+
+    return lastBlown.set();
+
+  }
+
+
+  //    GUI controls
+  public void gameOver() {
+
+    gameOver = true;
+    repaint();
+
+  }
+
+  public void restart() {
+
+    xCurrCell = -1;
+    yCurrCell = -1;
+
+    gameOver = false;
+    repaint();
+
+  }
+
+  public void updateUsername(String str) {
+
+    username = str;
+    repaint();
+
+  }
+
+  public void usernameBar() {
+
+    userBar = true;
+    repaint();
+
+  }
+
+  public void hideUsernameBar() {
+
+    userBar = false;
+    repaint();
+
+  }
+
+  public void showHighScore() {
+
+    showHighScore = !showHighScore;
+    repaint();
+
+  }
 
 }
