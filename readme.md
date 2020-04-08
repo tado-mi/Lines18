@@ -22,7 +22,7 @@ Some of the supported features include:
 
 - move the grid with a/w/s/d controls
 
-# included files:
+# Files:
 
 ## BallPath.java:
 
@@ -136,26 +136,8 @@ Convenience of putting two ints together.
 
 initialises an insance of *Lines18*.
 
-## Stack.java:
-
-Generic implementation of Stack data structure for further use in the method *isReacable()* in **Lines18.java**.
-
-Yes, I am one of those nerds that make it a point to write their own DS. Don't judge :)
-
 # Run
-
-**important**: need to fix dependencies
 
 ## makefile:
 
-For more information on the magic, see [here](https://www.cs.swarthmore.edu/~newhall/unixhelp/javamakefiles.html).
-
-## compiling:
-
-    make
-    java main
-    make clean
-
-# other
-
-shall such desire be felt, feel free to report bugs/suggestions/questions to tadouchiha@gmail.com
+For more information on the magic of makefiles, see [here](https://www.cs.swarthmore.edu/~newhall/unixhelp/javamakefiles.html). For compiling, hit on the terminal `make`. To run, run `make run`.
