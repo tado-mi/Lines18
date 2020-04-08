@@ -14,7 +14,7 @@ Some of the supported features include:
 * undo the last user move, acheived by maintaing (1) an array of two Points, representing the last user's latest move and switching it back.
 - an array of BallPaths representing the balls that disappeared in the result of the previous move (requested from the GUI)
 
-# user control not listed on GUI:
+#### user control not listed on GUI:
 
 - move balls around with the mouse
 
@@ -124,20 +124,6 @@ if so, erases the balls and increments the score by the number of erased balls
 
 updates the global array of locations and colors of future balls by randomly generating and ensuring that there are no conflicts with existing allignments
 
-## Lines18GUI.java:
-
-visual representation of the grid
-
-## Point.java:
-
-Convenience of putting two ints together.
-
-## main.java:
-
-initialises an insance of *Lines18*.
-
 # Run
-
-## makefile:
 
 For more information on the magic of makefiles, see [here](https://www.cs.swarthmore.edu/~newhall/unixhelp/javamakefiles.html). For compiling, hit on the terminal `make`. To run, run `make run`.
